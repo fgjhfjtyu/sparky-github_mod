@@ -292,6 +292,9 @@ class EditorViewModel @Inject constructor(
             is com.jackby03.sparky.domain.model.component.CurrentSource -> com.jackby03.sparky.domain.model.component.ComponentType.CURRENT_SOURCE
             is com.jackby03.sparky.domain.model.component.Diode         -> com.jackby03.sparky.domain.model.component.ComponentType.DIODE
             is com.jackby03.sparky.domain.model.component.Ground        -> com.jackby03.sparky.domain.model.component.ComponentType.GROUND
+            is com.jackby03.sparky.domain.model.component.SymbolComponent ->
+                runCatching { com.jackby03.sparky.domain.model.component.ComponentType.valueOf(template.componentType) }
+                    .getOrNull() ?: return
         }
         val nextLabel = com.jackby03.sparky.core.utils.AutoNumbering.nextLabel(type, circuit.components)
         // Offset the pasted component by 32 canvas units so it doesn't overlap the original

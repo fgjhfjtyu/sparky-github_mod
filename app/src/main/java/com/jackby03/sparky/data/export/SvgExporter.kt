@@ -1,6 +1,8 @@
 package com.jackby03.sparky.data.export
 
 import com.jackby03.sparky.domain.model.circuit.Circuit
+import com.jackby03.sparky.core.symbols.Prim
+import com.jackby03.sparky.core.symbols.SymbolLibrary
 import com.jackby03.sparky.domain.model.circuit.Node
 import com.jackby03.sparky.domain.model.component.Capacitor
 import com.jackby03.sparky.domain.model.component.CircuitComponent
@@ -9,6 +11,7 @@ import com.jackby03.sparky.domain.model.component.Diode
 import com.jackby03.sparky.domain.model.component.Ground
 import com.jackby03.sparky.domain.model.component.Inductor
 import com.jackby03.sparky.domain.model.component.Resistor
+import com.jackby03.sparky.domain.model.component.SymbolComponent
 import com.jackby03.sparky.domain.model.component.VoltageSource
 import com.jackby03.sparky.domain.model.export.SvgExportConfig
 import java.io.File
@@ -104,6 +107,42 @@ class SvgExporter @Inject constructor() {
     <line x1="${cx - 10}" y1="${cy + 6}" x2="${cx + 10}" y2="${cy + 6}" stroke="$s" stroke-width="$sw"/>
     <line x1="${cx - 4}" y1="${cy + 12}" x2="${cx + 4}" y2="${cy + 12}" stroke="$s" stroke-width="$sw"/>
 """
+            is SymbolComponent -> symbolSvg(c, cx, cy)
+        }
+    }
+
+    private fun symbolSvg(c: SymbolComponent, cx: Float, cy: Float): String = buildString {
+        val s = COMP_COLOR
+        val sw = 2.5f
+        val glyph = SymbolLibrary.glyphFor(c.componentType, c.symbol)
+        fun pts(p: List<Float>): String =
+            p.chunked(2).filter { it.size == 2 }.joinToString(" ") { "${cx + it[0]},${cy + it[1]}" }
+
+        for (prim in glyph.prims) {
+            when (prim) {
+                is Prim.Line -> appendLine("""    <line x1="${cx + prim.x1}" y1="${cy + prim.y1}" x2="${cx + prim.x2}" y2="${cy + prim.y2}" stroke="$s" stroke-width="$sw" stroke-linecap="round"/>""")
+                is Prim.Circle -> appendLine("""    <circle cx="${cx + prim.cx}" cy="${cy + prim.cy}" r="${prim.r}" fill="none" stroke="$s" stroke-width="$sw"/>""")
+                is Prim.Dot -> appendLine("""    <circle cx="${cx + prim.cx}" cy="${cy + prim.cy}" r="${prim.r}" fill="$s"/>""")
+                is Prim.Arc -> {
+                    if (kotlin.math.abs(prim.sweep) >= 360f) {
+                        appendLine("""    <circle cx="${cx + prim.cx}" cy="${cy + prim.cy}" r="${prim.r}" fill="none" stroke="$s" stroke-width="$sw"/>""")
+                    } else {
+                        val a0 = Math.toRadians(prim.start.toDouble())
+                        val a1 = Math.toRadians((prim.start + prim.sweep).toDouble())
+                        val x0 = cx + prim.cx + prim.r * kotlin.math.cos(a0).toFloat()
+                        val y0 = cy + prim.cy + prim.r * kotlin.math.sin(a0).toFloat()
+                        val x1 = cx + prim.cx + prim.r * kotlin.math.cos(a1).toFloat()
+                        val y1 = cy + prim.cy + prim.r * kotlin.math.sin(a1).toFloat()
+                        val large = if (kotlin.math.abs(prim.sweep) > 180f) 1 else 0
+                        val sweepFlag = if (prim.sweep >= 0f) 1 else 0
+                        appendLine("""    <path d="M$x0,$y0 A${prim.r},${prim.r} 0 $large,$sweepFlag $x1,$y1" fill="none" stroke="$s" stroke-width="$sw" stroke-linecap="round"/>""")
+                    }
+                }
+                is Prim.Rect -> appendLine("""    <rect x="${cx + prim.l}" y="${cy + prim.t}" width="${prim.r - prim.l}" height="${prim.b - prim.t}" fill="none" stroke="$s" stroke-width="$sw"/>""")
+                is Prim.Poly -> appendLine("""    <polygon points="${pts(prim.pts)}" fill="${if (prim.filled) s else "none"}" stroke="$s" stroke-width="$sw" stroke-linejoin="round"/>""")
+                is Prim.Polyline -> appendLine("""    <polyline points="${pts(prim.pts)}" fill="none" stroke="$s" stroke-width="$sw" stroke-linecap="round" stroke-linejoin="round"/>""")
+                is Prim.Label -> appendLine("""    <text x="${cx + prim.x}" y="${cy + prim.y}" text-anchor="middle" fill="$s" font-size="${prim.size}" font-weight="bold" font-family="sans-serif">${prim.text.escapeXml()}</text>""")
+            }
         }
     }
 
