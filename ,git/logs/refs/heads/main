@@ -1,0 +1,2 @@
+0000000000000000000000000000000000000000 3cb4c19e54333f0fe43ad2976b2b2e8f172b905c Sparky Dev <dev@example.com> 1795202844 +0000	commit (initial): Add IEC-style schematic symbol library, component catalog and CI
+3cb4c19e54333f0fe43ad2976b2b2e8f172b905c 156df74e6ada7f140614790e8b82373e7d8c376a Sparky Dev <dev@example.com> 1795358272 +0000	commit: Add 167 missing components (sources, switches, digital, ICs, EMC, power systems, drives, embedded, drawing items) with IEC-style glyphs
