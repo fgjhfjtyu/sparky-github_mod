@@ -1,0 +1,4 @@
+<resources>
+    <!-- Bridge theme for the Activity window. All UI is Compose / SparkTheme. -->
+    <style name="Theme.SparkyElectricalCircuitSimulator" parent="Theme.AppCompat.DayNight.NoActionBar" />
+</resources>
