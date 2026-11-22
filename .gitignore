@@ -1,0 +1,47 @@
+# Android / Gradle / Kotlin
+.gradle/
+**/build/
+captures/
+externalNativeBuild/
+**/.externalNativeBuild/
+**/.cxx/
+
+# Local environment and secrets
+local.properties
+*.jks
+*.keystore
+*.pem
+*.p12
+*.key
+*.env
+*.env.*
+
+# Kotlin / Java compiled artifacts
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.ear
+
+# IDE (Android Studio / IntelliJ)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code workspace settings (optional local)
+.vscode/
+ 
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Tooling
+.claude/
