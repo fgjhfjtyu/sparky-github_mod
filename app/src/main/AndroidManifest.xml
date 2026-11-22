@@ -24,6 +24,15 @@
             </intent-filter>
         </activity>
 
+        <!-- Shows the crash report on screen. Runs in its own process so it works
+             even when the main process dies during startup. -->
+        <activity
+            android:name=".CrashActivity"
+            android:exported="false"
+            android:process=":crash"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
     </application>
 
 </manifest>
